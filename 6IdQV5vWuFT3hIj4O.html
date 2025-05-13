@@ -1,0 +1,376 @@
+<html><head><base href="https://lite-brite-enhanced.example.com/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enhanced Lite Brite Simulator</title>
+<style>
+  body {
+    background-color: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: white;
+  }
+  #lite-brite {
+    background-color: #000;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(20, minmax(15px, 1fr));
+    gap: 5px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-width: calc(90vmin - 40px);
+    max-height: calc(90vmin - 40px);
+  }
+  .peg {
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%;
+    border-radius: 50%;
+    background-color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .peg:hover {
+    transform: scale(1.1);
+  }
+  #color-picker {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin: 0 5px;
+    cursor: pointer;
+    border: 2px solid #fff;
+  }
+  .button {
+    background-color: #4a4a4a;
+    border: none;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin: 0;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    height: 40px;
+    width: auto;
+    min-width: 40px;
+  }
+  .button:hover {
+    background-color: #5a5a5a;
+  }
+  #controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+  }
+  #filter-select,
+  #view-mode {
+    background-color: #4a4a4a;
+    border: none;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    height: 40px;
+    width: auto;
+    min-width: 40px;
+  }
+  #filter-select:hover,
+  #view-mode:hover {
+    background-color: #5a5a5a;
+  }
+  #canvas-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+</style>
+</head>
+<body>
+<div id="lite-brite">
+  <div id="canvas-container">
+    <div id="grid"></div>
+  </div>
+  <div id="color-picker">
+    <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
+    <div class="color-option" style="background-color: #00ff00;" data-color="#00ff00"></div>
+    <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
+    <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
+    <div class="color-option" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
+    <div class="color-option" style="background-color: #00ffff;" data-color="#00ffff"></div>
+  </div>
+  <div id="controls">
+    <button id="restart" class="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/>
+      </svg>
+    </button>
+    <button id="import" class="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+    </button>
+    <button id="save-export" class="button" title="Save/Export">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+    </button>
+    <button id="randomize" class="button" title="Randomize">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 3h5v5"/>
+        <path d="M4 20L21 3"/>
+        <path d="M21 16v5h-5"/>
+        <path d="M15 15l6 6"/>
+        <path d="M4 4l5 5"/>
+      </svg>
+    </button>
+    <select id="filter-select">
+      <option value="none">No Filter</option>
+      <option value="crt">CRT Filter</option>
+      <option value="pixelate">Pixelate Filter</option>
+      <option value="blur">Blur Filter</option>
+    </select>
+    <select id="view-mode" style="display: none;">
+      <option value="2d">2D View</option>
+    </select>
+  </div>
+</div>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script>
+const grid = document.getElementById('grid');
+const colorPicker = document.getElementById('color-picker');
+const restartButton = document.getElementById('restart');
+const importButton = document.getElementById('import');
+const saveExportButton = document.getElementById('save-export');
+const randomizeButton = document.getElementById('randomize');
+const filterSelect = document.getElementById('filter-select');
+let currentColor = '#ff0000';
+let pegs = [];
+
+// Create grid
+for (let i = 0; i < 400; i++) {
+  const peg = document.createElement('div');
+  peg.classList.add('peg');
+  peg.addEventListener('click', () => togglePeg(peg));
+  grid.appendChild(peg);
+  pegs.push(peg);
+}
+
+function togglePeg(peg) {
+  if (peg.style.backgroundColor === 'rgb(51, 51, 51)' || peg.style.backgroundColor === '') {
+    peg.style.backgroundColor = currentColor;
+    peg.style.boxShadow = `0 0 10px ${currentColor}`;
+  } else {
+    peg.style.backgroundColor = '#333';
+    peg.style.boxShadow = 'none';
+  }
+}
+
+// Set up color picker
+colorPicker.addEventListener('click', (e) => {
+  if (e.target.classList.contains('color-option')) {
+    currentColor = e.target.dataset.color;
+    document.querySelectorAll('.color-option').forEach(option => {
+      option.style.transform = 'scale(1)';
+    });
+    e.target.style.transform = 'scale(1.2)';
+  }
+});
+
+// Add drag functionality
+let isDragging = false;
+grid.addEventListener('mousedown', () => isDragging = true);
+grid.addEventListener('mouseup', () => isDragging = false);
+grid.addEventListener('mouseleave', () => isDragging = false);
+grid.addEventListener('mouseover', (e) => {
+  if (isDragging && e.target.classList.contains('peg')) {
+    togglePeg(e.target);
+  }
+});
+
+// Restart button functionality
+restartButton.addEventListener('click', () => {
+  pegs.forEach(peg => {
+    peg.style.backgroundColor = '#333';
+    peg.style.boxShadow = 'none';
+  });
+});
+
+// Import button functionality
+importButton.addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 20;
+        canvas.height = 20;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, 20, 20);
+        const imageData = ctx.getImageData(0, 0, 20, 20);
+        for (let i = 0; i < imageData.data.length; i += 4) {
+          const index = i / 4;
+          const r = imageData.data[i];
+          const g = imageData.data[i + 1];
+          const b = imageData.data[i + 2];
+          const color = `rgb(${r},${g},${b})`;
+          pegs[index].style.backgroundColor = color;
+          pegs[index].style.boxShadow = `0 0 10px ${color}`;
+        }
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+});
+
+// Save/Export functionality
+function saveExport() {
+  const gridWidth = grid.clientWidth;
+  const gridHeight = grid.clientHeight;
+
+  // Create a new canvas with a black background
+  const canvas = document.createElement('canvas');
+  canvas.width = gridWidth;
+  canvas.height = gridHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, gridWidth, gridHeight);
+
+  // Use html2canvas to capture the grid
+  html2canvas(grid, { backgroundColor: null }).then(gridCanvas => {
+    // Draw the captured grid onto the black background
+    ctx.drawImage(gridCanvas, 0, 0, gridWidth, gridHeight);
+
+    // Create a download link for the final image
+    const link = document.createElement('a');
+    link.download = 'lite-brite-creation.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+
+// Randomize colors on the board
+function randomize() {
+  const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#333333'];
+  pegs.forEach(peg => {
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    peg.style.backgroundColor = randomColor;
+    peg.style.boxShadow = randomColor === '#333333' ? 'none' : `0 0 10px ${randomColor}`;
+  });
+}
+
+// Add event listeners for the new buttons
+saveExportButton.addEventListener('click', saveExport);
+randomizeButton.addEventListener('click', randomize);
+
+// Filter functionality
+filterSelect.addEventListener('change', applyFilter);
+
+function applyFilter() {
+  const filter = filterSelect.value;
+  switch (filter) {
+    case 'none':
+      grid.style.filter = 'none';
+      break;
+    case 'crt':
+      grid.style.filter = 'blur(1px) contrast(1.4) brightness(0.8)';
+      break;
+    case 'pixelate':
+      grid.style.filter = 'url(#pixelate)';
+      break;
+    case 'blur':
+      grid.style.filter = 'blur(2px)';
+      break;
+  }
+}
+
+// Responsive design
+window.addEventListener('resize', () => {
+  // You can add code here for responsive adjustments if needed
+});
+
+// Easter egg: Shake effect
+let shakeTimeout;
+window.addEventListener('devicemotion', (event) => {
+  if (event.acceleration.x > 15 || event.acceleration.y > 15) {
+    clearTimeout(shakeTimeout);
+    grid.style.animation = 'shake 0.5s';
+    shakeTimeout = setTimeout(() => {
+      grid.style.animation = '';
+    }, 500);
+  }
+});
+</script>
+
+<style>
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+</style>
+
+<svg style="display: none;">
+  <filter id="pixelate">
+    <feFlood x="4" y="4" height="2" width="2"/>
+    <feComposite width="10" height="10"/>
+    <feTile result="a"/>
+    <feComposite in="SourceGraphic" in2="a" operator="in"/>
+    <feMorphology operator="dilate" radius="2"/>
+  </filter>
+</svg>
+
+</body></html>
